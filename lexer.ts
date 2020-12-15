@@ -1,49 +1,4 @@
-export interface TokenLit {
-  type: Literals;
-  value: string;
-}
-
-export enum Literals {
-  Ident,
-  Int,
-  Bool,
-  String,
-  Illegal,
-  Blank,
-  Eof,
-  Assign,
-  If,
-  Else,
-  While,
-  Plus,
-  Minus,
-  Bang,
-  Asterisk,
-  Slash,
-  Caret,
-  Dot,
-  Let,
-  Percent,
-  Equal,
-  NotEqual,
-  LessThan,
-  LessThanEqual,
-  GreaterThan,
-  GreaterThanEqual,
-  Comma,
-  Colon,
-  Semicolon,
-  Lparen,
-  Rparen,
-  Lbrace,
-  Rbrace,
-  Lbracket,
-  Rbracket,
-  Whitespace,
-  Func,
-  Return,
-  Import,
-}
+import { TokenLit, Literals } from "./lexer/tokens.ts";
 
 const alphabets = [
   "A",
@@ -98,6 +53,7 @@ const alphabets = [
   "x",
   "y",
   "z",
+  "_"
 ];
 
 const numbers = [
@@ -145,7 +101,39 @@ export class Lexer {
   nextch_is(ch: string): boolean {
     return this.nextch() == ch;
   }
+  
+  skip_ident(): string | false {
+    let ws: string | false = false;
+    loop:
+    for (;;) {
+      if(this.ch == 0) break loop;
+      if(alphabets.includes(this.ch)) {
+        ws ? ws = ws + this.ch : ws = this.ch
+        this.read_char()
+      } else {
+        break loop;
+      }
+    }
+    return ws;
+  }
 
+  skip_until(ch: string): string | false {
+    let ws: string | false = false;
+    loop:
+    for (;;) {
+      switch (this.ch) {
+        case ch:
+        case 0:
+          break loop;
+        default:
+          ws ? ws = ws + this.ch : ws = this.ch
+          this.read_char();
+          break;
+      }
+    }
+    return ws;
+  }
+  
   handle_whitespace(): string | false {
     let ws: string | false = false;
     loop:
@@ -162,47 +150,19 @@ export class Lexer {
     return ws;
   }
 
-  next_token(): TokenLit {
-    let ws = this.handle_whitespace();
-    if(ws) return { type: Literals.Whitespace, value: ws };
+  next_token(peek_only?: boolean): TokenLit {
+    if(!peek_only) {
+      let ws = this.handle_whitespace();
+      if(ws) return { type: Literals.Whitespace, value: ws };
+    }
     let tok = Literals.Illegal;
     let lit = this.ch;
     switch (this.ch) {
       case "=":
-        if (this.nextch_is("=")) {
-          this.read_char();
-          lit += this.ch;
-          tok = Literals.Equal;
-        } else {
           tok = Literals.Assign;
-        }
         break;
       case "!":
-        if (this.nextch_is("=")) {
-          this.read_char();
-          lit += this.ch;
-          tok = Literals.NotEqual;
-        } else {
           tok = Literals.Bang;
-        }
-        break;
-      case "<":
-        if (this.nextch_is("=")) {
-          this.read_char();
-          lit += this.ch;          
-          tok = Literals.LessThanEqual;
-        } else {
-          tok = Literals.LessThan;
-        }
-        break;
-      case ">":
-        if (this.nextch_is("=")) {
-          this.read_char();
-          lit += this.ch;          
-          tok = Literals.GreaterThanEqual;
-        } else {
-          tok = Literals.GreaterThan;
-        }
         break;
       case "\n":
           tok = Literals.Blank;
@@ -246,6 +206,9 @@ export class Lexer {
       case ":":
         tok = Literals.Colon;
         break;
+      case ".":
+        tok = Literals.Dot;
+      break;
       case '"':
       case "'":
         return this.consume_string(this.ch);
@@ -261,7 +224,7 @@ export class Lexer {
         }
         break;
     }
-    this.read_char();
+    if(!peek_only) this.read_char();
     return { type: tok, value: typeof lit === "number" ? "\n" : lit };
   }
 
@@ -280,31 +243,6 @@ export class Lexer {
 
     let tok: TokenLit = { type: Literals.Ident, value: literal };
 
-    switch (literal) {
-      case "func":
-        tok.type = Literals.Func;
-        break;
-      case "let":
-        tok.type = Literals.Let;
-        break;
-      case "if":
-        tok.type = Literals.If;
-        break;
-      case "else":
-        tok.type = Literals.Else;
-        break;
-      case "return":
-        tok.type = Literals.Return;
-        break;
-      case "true":
-        tok.type = Literals.Bool;
-        break;
-      case "false":
-        tok.type = Literals.Bool;
-        break;
-      default:
-        break;
-    }
     return tok;
   }
 
