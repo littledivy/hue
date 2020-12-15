@@ -12,6 +12,38 @@ class Typescript extends Lexer {
     super(code);
   }
 
+  private read_comments(): string {
+    let skipped = this.skip_until("\n") || "";
+    let v = "/" + skipped;
+    return gray(v);
+  }
+
+  private read_block_comments(): string {
+    let block: string = "";
+    loop:
+    for (;;) {
+      switch (this.ch) {
+        case "*":
+        case 0:
+          block = block + this.ch;
+          if (this.input[this.next_pos] == "/") {
+            this.read_char();
+            block = block + this.ch;
+            this.read_char();
+            break loop;
+          }
+          this.read_char();
+          break;
+        default:
+          block = block + this.ch;
+          this.read_char();
+          break;
+      }
+    }
+    let v = "/" + block;
+    return gray(v);
+  }
+
   private highlight_chain(): string {
     let val: string = "";
     if (this.input[this.next_pos - 1] == ".") {
@@ -43,10 +75,12 @@ class Typescript extends Lexer {
           val = green(String(tok.value));
           break;
         case Literals.Slash:
-          if (this.next_token(true).value == "/") {
-            let skipped = this.skip_until("\n") || "";
-            let v = "/" + skipped;
-            val = gray(v);
+          let nxt = this.next_token(true).value;
+          if (nxt == "/") {
+            val = this.read_comments();
+            break;
+          } else if (nxt == "*") {
+            val = this.read_block_comments();
             break;
           }
           break;
@@ -60,5 +94,5 @@ class Typescript extends Lexer {
   }
 }
 
-new Typescript(Deno.readTextFileSync("languages/typescript/typescript.ts"))
+new Typescript(Deno.readTextFileSync("lexer/lexer.ts"))
   .highlight();
