@@ -1,7 +1,7 @@
-import { Lexer } from "./lexer.ts";
-import {Literals} from "./lexer/tokens.ts";
+import { Lexer } from "../../lexer/lexer.ts";
+import { Literals } from "../../lexer/tokens.ts";
 
-import { gray, green, red, yellow } from "https://deno.land/std/fmt/colors.ts";
+import { gray, green, red, yellow } from "../../deps.ts";
 
 const red_keywords = [
   "abstract",  "as",      "asserts",     "async",

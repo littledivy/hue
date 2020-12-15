@@ -1,80 +1,38 @@
-import { TokenLit, Literals } from "./lexer/tokens.ts";
+import { TokenLit, Literals } from "./tokens.ts";
+import { alphabets, numbers } from "./const.ts";
 
-const alphabets = [
-  "A",
-  "B",
-  "C",
-  "D",
-  "E",
-  "F",
-  "G",
-  "H",
-  "I",
-  "J",
-  "K",
-  "L",
-  "M",
-  "N",
-  "O",
-  "P",
-  "Q",
-  "R",
-  "S",
-  "T",
-  "U",
-  "V",
-  "W",
-  "X",
-  "Y",
-  "Z",
-  "a",
-  "b",
-  "c",
-  "d",
-  "e",
-  "f",
-  "g",
-  "h",
-  "i",
-  "j",
-  "k",
-  "l",
-  "m",
-  "n",
-  "o",
-  "p",
-  "q",
-  "r",
-  "s",
-  "t",
-  "u",
-  "v",
-  "w",
-  "x",
-  "y",
-  "z",
-  "_"
-];
-
-const numbers = [
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "0",
-];
-
+/**
+ * The lexer implementation for creating syntax highlighters,
+ * covers most C-like syntax and can be extended to lex pretty much everything.
+ * 
+ * Creating a lexer:
+ * ```typescript
+ * const code = "1 + 1"
+ * 
+ * let lexer = new Lexer(code);
+ * let tok;
+ * 
+ * while(tok = lexer.next_token()) {
+ *   // Add your logic here...
+ *   if(tok.type == Literals.Eof) {
+ *     break; 
+ *   }
+ * }
+ * ```
+ */
 export class Lexer {
   input: string;
+  // Current position of the lexer
   pos: number = 0;
+  // Next position of the lexer
   next_pos: number = 0;
+  // Current character being analysed
   ch: string | 0 = 0;
 
+  /**
+   * Create a lexer instance for source code
+   * @param input source code to be lexed
+   */
   constructor(input: string) {
     this.input = input;
     this.read_char();
@@ -266,7 +224,7 @@ export class Lexer {
     let quo = char;
     this.read_char();
     char += this.ch;
-    let start_pos = this.pos;
+
     for (;;) {
       if (this.ch == quo || this.ch === 0) {
         break;
@@ -275,7 +233,6 @@ export class Lexer {
         char += this.ch
       }
     }
-    let literal = this.input.substring(start_pos, this.pos);
 
     this.read_char();
     return { type: Literals.String, value: typeof char === "number" ? "\n" : char };
