@@ -1,4 +1,4 @@
-import { TokenLit, Literals } from "./tokens.ts";
+import { Literals, TokenLit } from "./tokens.ts";
 import { alphabets, numbers } from "./const.ts";
 
 /**
@@ -59,15 +59,15 @@ export class Lexer {
   nextch_is(ch: string): boolean {
     return this.nextch() == ch;
   }
-  
+
   skip_ident(): string | false {
     let ws: string | false = false;
     loop:
     for (;;) {
-      if(this.ch == 0) break loop;
-      if(alphabets.includes(this.ch)) {
-        ws ? ws = ws + this.ch : ws = this.ch
-        this.read_char()
+      if (this.ch == 0) break loop;
+      if (alphabets.includes(this.ch)) {
+        ws ? ws = ws + this.ch : ws = this.ch;
+        this.read_char();
       } else {
         break loop;
       }
@@ -84,21 +84,21 @@ export class Lexer {
         case 0:
           break loop;
         default:
-          ws ? ws = ws + this.ch : ws = this.ch
+          ws ? ws = ws + this.ch : ws = this.ch;
           this.read_char();
           break;
       }
     }
     return ws;
   }
-  
+
   handle_whitespace(): string | false {
     let ws: string | false = false;
     loop:
     for (;;) {
       switch (this.ch) {
         case " " || "\t":
-          ws ? ws = ws + this.ch : ws = this.ch
+          ws ? ws = ws + this.ch : ws = this.ch;
           this.read_char();
           break;
         default:
@@ -109,21 +109,21 @@ export class Lexer {
   }
 
   next_token(peek_only?: boolean): TokenLit {
-    if(!peek_only) {
+    if (!peek_only) {
       let ws = this.handle_whitespace();
-      if(ws) return { type: Literals.Whitespace, value: ws };
+      if (ws) return { type: Literals.Whitespace, value: ws };
     }
     let tok = Literals.Illegal;
     let lit = this.ch;
     switch (this.ch) {
       case "=":
-          tok = Literals.Assign;
+        tok = Literals.Assign;
         break;
       case "!":
-          tok = Literals.Bang;
+        tok = Literals.Bang;
         break;
       case "\n":
-          tok = Literals.Blank;
+        tok = Literals.Blank;
         break;
       case "+":
         tok = Literals.Plus;
@@ -166,7 +166,7 @@ export class Lexer {
         break;
       case ".":
         tok = Literals.Dot;
-      break;
+        break;
       case '"':
       case "'":
         return this.consume_string(this.ch);
@@ -182,7 +182,7 @@ export class Lexer {
         }
         break;
     }
-    if(!peek_only) this.read_char();
+    if (!peek_only) this.read_char();
     return { type: tok, value: typeof lit === "number" ? "\n" : lit };
   }
 
@@ -230,13 +230,14 @@ export class Lexer {
         break;
       } else {
         this.read_char();
-        char += this.ch
+        char += this.ch;
       }
     }
 
     this.read_char();
-    return { type: Literals.String, value: typeof char === "number" ? "\n" : char };
+    return {
+      type: Literals.String,
+      value: typeof char === "number" ? "\n" : char,
+    };
   }
 }
-
-
