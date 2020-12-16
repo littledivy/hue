@@ -35,7 +35,7 @@ export const statics = [
 // Implements formatting for keywords.
 export function print(keyword: string): string {
   let fmt = keyword;
-  
+
   if (statics.includes(keyword)) {
     fmt = red(keyword);
   } else if (types.includes(keyword)) {
