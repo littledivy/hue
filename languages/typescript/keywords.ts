@@ -71,19 +71,21 @@ export const statics = [
 
 // Implements formatting for keywords.
 export function print(keyword: string): string {
-  if (italics.includes(keyword)) {
-    keyword = italic(keyword);
-  }
+  let fmt = keyword;
+  
   if (statics.includes(keyword)) {
-    return red(keyword);
+    fmt = red(keyword);
   } else if (types.includes(keyword)) {
-    return yellow(keyword);
+    fmt = yellow(keyword);
   } else if (expt.includes(keyword)) {
-    return green(keyword);
+    fmt = green(keyword);
   }
-  return keyword;
+  if (italics.includes(keyword)) {
+    fmt = italic(fmt);
+  }
+  return fmt;
 }
 
-const italics = ["Deno"];
+const italics = ["Deno", "process", "window", "globalThis", "this"];
 const types = ["module", "string", "any", "number"];
 const expt = ["constructor", "true", "false"];
