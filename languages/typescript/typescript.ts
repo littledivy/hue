@@ -1,21 +1,23 @@
 import { Lexer } from "../../lexer/lexer.ts";
 import { Literals } from "../../lexer/tokens.ts";
 
-import { gray, green, red, yellow } from "../../deps.ts";
 import { print } from "./keywords.ts";
+import { color, ConsoleTheme, DefaultTheme } from "../../themes/mod.ts";
 
 const encoder = new TextEncoder();
 const eof = encoder.encode("\n");
 
 class Typescript extends Lexer {
-  constructor(code: string) {
+  theme: ConsoleTheme;
+  constructor(code: string, theme: ConsoleTheme) {
     super(code);
+    this.theme = theme;
   }
 
   private read_comments(): string {
     let skipped = this.skip_until("\n") || "";
     let v = "/" + skipped;
-    return gray(v);
+    return color(this.theme.comments, v);
   }
 
   private read_block_comments(): string {
@@ -41,7 +43,7 @@ class Typescript extends Lexer {
       }
     }
     let v = "/" + block;
-    return gray(v);
+    return color(this.theme.comments, v);
   }
 
   private highlight_chain(): string {
@@ -49,7 +51,7 @@ class Typescript extends Lexer {
     if (this.input[this.next_pos - 1] == ".") {
       this.read_char();
       let skipped = this.skip_ident() || "";
-      val += "." + green(skipped);
+      val += "." + color(this.theme.reserved_methods, skipped);
       val += this.highlight_chain();
       return val;
     } else {
@@ -69,10 +71,10 @@ class Typescript extends Lexer {
           break loop;
           break;
         case Literals.Int:
-          val = yellow(tok.value);
+          val = color(this.theme.numbers, tok.value);
           break;
         case Literals.String:
-          val = green(String(tok.value));
+          val = color(this.theme.string, tok.value);
           break;
         case Literals.Slash:
           let nxt = this.next_token(true).value;
@@ -94,5 +96,5 @@ class Typescript extends Lexer {
   }
 }
 
-new Typescript(Deno.readTextFileSync("lexer/lexer.ts"))
+new Typescript(Deno.readTextFileSync("lexer/lexer.ts"), DefaultTheme)
   .highlight();
