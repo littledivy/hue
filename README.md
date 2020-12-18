@@ -1,4 +1,4 @@
-# `picta`
+# `hue`
 
 ![](showcase.png)
 
