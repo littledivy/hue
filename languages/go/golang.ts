@@ -2,14 +2,19 @@ import { Lexer } from "../../lexer/lexer.ts";
 import { Literals } from "../../lexer/tokens.ts";
 
 import { gray, green, yellow } from "../../deps.ts";
-import { print } from "./keywords.ts";
+import { Printer } from "./keywords.ts";
+import { ConsoleTheme, DefaultTheme } from "../../themes/mod.ts";
 
 const encoder = new TextEncoder();
 const eof = encoder.encode("\n");
 
 class Golang extends Lexer {
-  constructor(code: string) {
+  theme: ConsoleTheme;
+  printer: Printer;
+  constructor(code: string, theme: ConsoleTheme) {
     super(code);
+    this.theme = theme;
+    this.printer = new Printer(theme);
   }
 
   private read_comments(): string {
@@ -85,7 +90,7 @@ class Golang extends Lexer {
           }
           break;
         default:
-          val = print(val);
+          val = this.printer.print(val);
           val += this.highlight_chain();
           break;
       }
@@ -94,5 +99,4 @@ class Golang extends Lexer {
   }
 }
 
-new Golang(Deno.readTextFileSync("fixtures/go.go"))
-  .highlight();
+export default Golang;

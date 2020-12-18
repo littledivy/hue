@@ -1,11 +1,7 @@
-import {
-  green,
-  italic,
-  red,
-  yellow,
-} from "https://deno.land/std@0.80.0/fmt/colors.ts";
+import { color, ConsoleTheme } from "../../themes/mod.ts";
+import { italic } from "https://deno.land/std@0.80.0/fmt/colors.ts";
 
-export const statics = [
+export const keywords = [
   "abstract",
   "as",
   "asserts",
@@ -16,7 +12,6 @@ export const statics = [
   "catch",
   "class",
   "const",
-  "constructor",
   "continue",
   "debugger",
   "declare",
@@ -56,7 +51,6 @@ export const statics = [
   "static",
   "super",
   "switch",
-  "this",
   "throw",
   "try",
   "type",
@@ -69,23 +63,29 @@ export const statics = [
   "yield",
 ];
 
-// Implements formatting for keywords.
-export function print(keyword: string): string {
-  let fmt = keyword;
+export class Printer {
+  theme: ConsoleTheme;
+  constructor(theme: ConsoleTheme) {
+    this.theme = theme;
+  }
 
-  if (statics.includes(keyword)) {
-    fmt = red(keyword);
-  } else if (types.includes(keyword)) {
-    fmt = yellow(keyword);
-  } else if (expt.includes(keyword)) {
-    fmt = green(keyword);
+  print(keyword: string): string {
+    let fmt = keyword;
+
+    if (keywords.includes(keyword)) {
+      fmt = color(this.theme.identifiers, keyword);
+    } else if (types.includes(keyword)) {
+      fmt = color(this.theme.types, keyword);
+    } else if (expt.includes(keyword)) {
+      fmt = color(this.theme.reserved_methods, keyword);
+    }
+    if (globals.includes(keyword)) {
+      fmt = italic(fmt);
+    }
+    return fmt;
   }
-  if (italics.includes(keyword)) {
-    fmt = italic(fmt);
-  }
-  return fmt;
 }
 
-const italics = ["Deno", "process", "window", "globalThis", "this"];
-const types = ["module", "string", "any", "number"];
+const globals = ["Deno", "process", "window", "globalThis", "this"];
+const types = ["module", "string", "any", "number", "this"];
 const expt = ["constructor", "true", "false"];

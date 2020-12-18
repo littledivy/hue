@@ -10,10 +10,16 @@ Syntax highlighter for all kinds of shit.
 
 * Lightweight, *for real*
 * Fast
-* Highlight from the terminal or use on the web.
-* Supports [Deno](https://deno.land), [Node](https://nodejs.org) & browsers.
-* Themes
+* Highlight from the terminal 
+* Supports [Deno](https://deno.land).
+* Themes & customizations.
+* Currently, Typescript & Golang highlighting supported.
+
+### Planned
+
+* Generate HTML markup
+* Support [Node](https://nodejs.org) & browsers.
+* More themes
 * Automatic language detection.
-
-
+* Establish printers for more and more languages.
 

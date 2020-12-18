@@ -13,17 +13,17 @@ const FgBlack = "\x1b[30m",
 export interface ConsoleTheme {
   identifiers: string;
   reserved_methods: string;
-  globals: string;
   string: string;
   numbers: string;
   comments: string;
+  types: string;
 }
 
 export const DefaultTheme: ConsoleTheme = {
   identifiers: FgRed,
   reserved_methods: FgGreen,
-  globals: FgRed,
-  string: FgYellow,
+  types: FgYellow,
+  string: FgGreen,
   numbers: FgBlue,
   comments: FgGray,
 };
