@@ -75,6 +75,12 @@ class Typescript extends Lexer {
         case Literals.Int:
           val = color(this.theme.numbers, tok.value);
           break;
+        case Literals.Asterisk:
+        case Literals.Bang:
+        case Literals.Plus:
+        case Literals.Minus:
+          val = color(this.theme.operators, tok.value);
+          break;
         case Literals.String:
           val = color(this.theme.string, tok.value);
           break;
@@ -86,6 +92,9 @@ class Typescript extends Lexer {
           } else if (nxt == "*") {
             val = this.read_block_comments();
             break;
+          } else {
+            // It is division op.
+            val = color(this.theme.operators, tok.value);
           }
           break;
         default:

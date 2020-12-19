@@ -15,6 +15,7 @@ export interface ConsoleTheme {
   reserved_methods: string;
   string: string;
   numbers: string;
+  operators: string;
   comments: string;
   types: string;
 }
@@ -26,6 +27,7 @@ export const DefaultTheme: ConsoleTheme = {
   string: FgGreen,
   numbers: FgBlue,
   comments: FgGray,
+  operators: FgCyan,
 };
 
 export function color(code: string, str: string): string {
