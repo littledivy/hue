@@ -45,5 +45,5 @@ let c = new Calc();
 c.add(1, 2);
 `;
 
-let printer = new Typescript(source_code, DefaultTheme, { output: "markup" });
-printer.highlight();
+let printer = new Typescript(source_code, DefaultTheme, { output: "console" });
+console.log(printer.highlight());

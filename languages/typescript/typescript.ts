@@ -70,7 +70,8 @@ class Typescript extends Lexer {
     }
   }
 
-  async highlight() {
+  public highlight(): string {
+    let output: string = "";
     loop:
     for (;;) {
       let tok = this.next_token();
@@ -78,7 +79,6 @@ class Typescript extends Lexer {
       let val = tok.value;
       switch (tok.type) {
         case Literals.Eof:
-          await Deno.stdout.write(eof);
           break loop;
           break;
         case Literals.Int:
@@ -111,8 +111,9 @@ class Typescript extends Lexer {
           val += this.highlight_chain();
           break;
       }
-      await Deno.stdout.write(encoder.encode(val));
+      output += val;
     }
+    return output;
   }
 }
 
