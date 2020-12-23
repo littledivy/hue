@@ -1,4 +1,5 @@
 import Typescript from "../languages/typescript/typescript.ts";
+import Golang from "../languages/go/golang.ts";
 import { DefaultTheme } from "../themes/mod.ts";
 
 const source_code = `
@@ -45,5 +46,5 @@ let c = new Calc();
 c.add(1, 2);
 `;
 
-let printer = new Typescript(source_code, DefaultTheme, { output: "console" });
+let printer = new Golang(source_code, DefaultTheme, { output: "markup" });
 console.log(printer.highlight());
