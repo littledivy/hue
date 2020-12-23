@@ -2,24 +2,33 @@ import { Lexer } from "../../lexer/lexer.ts";
 import { Literals } from "../../lexer/tokens.ts";
 
 import { Printer } from "./keywords.ts";
-import { color, ConsoleTheme, DefaultTheme } from "../../themes/mod.ts";
+import {
+  ConsoleTheme,
+  DefaultTheme,
+  MarkupTheme,
+  Theme,
+} from "../../themes/mod.ts";
 
 const encoder = new TextEncoder();
 const eof = encoder.encode("\n");
 
+export interface Options {
+  output: "console" | "markup";
+}
+
 class Typescript extends Lexer {
-  theme: ConsoleTheme;
+  theme: ConsoleTheme | MarkupTheme;
   printer: Printer;
-  constructor(code: string, theme: ConsoleTheme) {
+  constructor(code: string, theme: Theme, options: Options) {
     super(code);
-    this.theme = theme;
-    this.printer = new Printer(theme);
+    this.theme = options.output == "console" ? theme.console : theme.markup;
+    this.printer = new Printer(this.theme, options);
   }
 
   private read_comments(): string {
     let skipped = this.skip_until("\n") || "";
     let v = "/" + skipped;
-    return color(this.theme.comments, v);
+    return this.printer.print_comments(v);
   }
 
   private read_block_comments(): string {
@@ -45,7 +54,7 @@ class Typescript extends Lexer {
       }
     }
     let v = "/" + block;
-    return color(this.theme.comments, v);
+    return this.printer.print_comments(v);
   }
 
   private highlight_chain(): string {
@@ -53,7 +62,7 @@ class Typescript extends Lexer {
     if (this.input[this.next_pos - 1] == ".") {
       this.read_char();
       let skipped = this.skip_ident() || "";
-      val += "." + color(this.theme.reserved_methods, skipped);
+      val += "." + this.printer.print_chain(skipped);
       val += this.highlight_chain();
       return val;
     } else {
@@ -61,7 +70,8 @@ class Typescript extends Lexer {
     }
   }
 
-  async highlight() {
+  public highlight(): string {
+    let output: string = "";
     loop:
     for (;;) {
       let tok = this.next_token();
@@ -69,20 +79,19 @@ class Typescript extends Lexer {
       let val = tok.value;
       switch (tok.type) {
         case Literals.Eof:
-          await Deno.stdout.write(eof);
           break loop;
           break;
         case Literals.Int:
-          val = color(this.theme.numbers, tok.value);
+          val = this.printer.print_numbers(tok.value);
           break;
         case Literals.Asterisk:
         case Literals.Bang:
         case Literals.Plus:
         case Literals.Minus:
-          val = color(this.theme.operators, tok.value);
+          val = this.printer.print_operators(tok.value);
           break;
         case Literals.String:
-          val = color(this.theme.string, tok.value);
+          val = this.printer.print_string(tok.value);
           break;
         case Literals.Slash:
           let nxt = this.next_token(true).value;
@@ -94,7 +103,7 @@ class Typescript extends Lexer {
             break;
           } else {
             // It is division op.
-            val = color(this.theme.operators, tok.value);
+            val = this.printer.print_operators(tok.value);
           }
           break;
         default:
@@ -102,8 +111,9 @@ class Typescript extends Lexer {
           val += this.highlight_chain();
           break;
       }
-      await Deno.stdout.write(encoder.encode(val));
+      output += val;
     }
+    return output;
   }
 }
 

@@ -97,7 +97,8 @@ export class Lexer {
     loop:
     for (;;) {
       switch (this.ch) {
-        case " " || "\t":
+        case " ":
+        case "\t":
           ws ? ws = ws + this.ch : ws = this.ch;
           this.read_char();
           break;
